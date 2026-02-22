@@ -5,7 +5,7 @@ option go_package = "./mediabase_v1";
 
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "proto/common/ping.proto";
+import "proto/mediabase/v1/ping.proto";
 import "validate/validate.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {

@@ -492,7 +492,7 @@ var File_proto_mediabase_v1_mediabase_proto protoreflect.FileDescriptor
 
 const file_proto_mediabase_v1_mediabase_proto_rawDesc = "" +
 	"\n" +
-	"\"proto/mediabase/v1/mediabase.proto\x12\x02v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\x1a\x17proto/common/ping.proto\x1a\x17validate/validate.proto\"\\\n" +
+	"\"proto/mediabase/v1/mediabase.proto\x12\x02v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\x1a\x1dproto/mediabase/v1/ping.proto\x1a\x17validate/validate.proto\"\\\n" +
 	"\x13CreateBucketRequest\x12(\n" +
 	"\vbucket_name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"bucketName\x12\x1b\n" +
@@ -597,7 +597,7 @@ func file_proto_mediabase_v1_mediabase_proto_init() {
 	if File_proto_mediabase_v1_mediabase_proto != nil {
 		return
 	}
-	file_proto_common_ping_proto_init()
+	file_proto_mediabase_v1_ping_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
