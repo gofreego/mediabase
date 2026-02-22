@@ -13,13 +13,10 @@ services:
       
     command: server /data --console-address ":9001"
     volumes:
-      - minio_data:/data
+      - /mnt/important-data/minio:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
 
-volumes:
-  minio_data:
-    driver: local
