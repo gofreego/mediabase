@@ -1,0 +1,356 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "mediabase API",
+    "description": "mediabase is a generic media storage service supporting presigned uploads and downloads.",
+    "version": "v1.0.0"
+  },
+  "tags": [
+    {
+      "name": "Ping",
+      "description": "Health check endpoints"
+    },
+    {
+      "name": "Upload",
+      "description": "Media upload and management endpoints"
+    },
+    {
+      "name": "MediabaseService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/upload/bucket": {
+      "post": {
+        "summary": "Create bucket",
+        "description": "Creates a bucket and optionally sets its policy to allow public read access while keeping uploads private (via presigned URLs).",
+        "operationId": "MediabaseService_CreateBucket",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateBucketResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateBucketRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Upload"
+        ]
+      }
+    },
+    "/api/upload/object/{objectKey}": {
+      "delete": {
+        "summary": "Delete object",
+        "description": "Deletes a file from storage.",
+        "operationId": "MediabaseService_DeleteObject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteObjectResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "objectKey",
+            "description": "Object key/path in storage",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "bucketName",
+            "description": "Bucket name where the file is stored",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Upload"
+        ]
+      }
+    },
+    "/api/upload/presign/download": {
+      "post": {
+        "summary": "Generate presigned download URL",
+        "description": "Returns a presigned URL for downloading a file from storage.",
+        "operationId": "MediabaseService_PresignDownload",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PresignDownloadResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PresignDownloadRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Upload"
+        ]
+      }
+    },
+    "/api/upload/presign/upload": {
+      "post": {
+        "summary": "Generate presigned upload URL",
+        "description": "Returns a presigned URL for uploading a file directly to storage.",
+        "operationId": "MediabaseService_PresignUpload",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PresignUploadResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PresignUploadRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Upload"
+        ]
+      }
+    },
+    "/mediabase/v1/ping": {
+      "get": {
+        "summary": "Ping the server",
+        "description": "Check if the server is alive.",
+        "operationId": "MediabaseService_Ping",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "message",
+            "description": "Message must be non-empty and between 1-100 characters",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Ping"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateBucketRequest": {
+      "type": "object",
+      "properties": {
+        "bucketName": {
+          "type": "string"
+        },
+        "isPublic": {
+          "type": "boolean"
+        }
+      },
+      "title": "CreateBucketRequest contains the bucket name and public access preference"
+    },
+    "v1CreateBucketResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "title": "CreateBucketResponse indicates successful creation"
+    },
+    "v1DeleteObjectResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "title": "Whether the deletion was successful"
+        }
+      },
+      "title": "DeleteObjectResponse indicates successful deletion"
+    },
+    "v1PingResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      },
+      "description": "PingResponse is the response message for the Ping RPC method."
+    },
+    "v1PresignDownloadRequest": {
+      "type": "object",
+      "properties": {
+        "bucketName": {
+          "type": "string",
+          "title": "Bucket name where the file is stored"
+        },
+        "objectKey": {
+          "type": "string",
+          "title": "Object key/path in storage"
+        }
+      },
+      "title": "PresignDownloadRequest contains the object key for download"
+    },
+    "v1PresignDownloadResponse": {
+      "type": "object",
+      "properties": {
+        "presignedUrl": {
+          "type": "string",
+          "title": "Presigned URL for downloading the file"
+        },
+        "expiresIn": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Expiration time in seconds"
+        }
+      },
+      "title": "PresignDownloadResponse contains the presigned download URL"
+    },
+    "v1PresignUploadRequest": {
+      "type": "object",
+      "properties": {
+        "bucketName": {
+          "type": "string",
+          "title": "Bucket name where the file should be uploaded"
+        },
+        "contentType": {
+          "type": "string",
+          "title": "Content type of the file (e.g., \"image/jpeg\", \"image/png\", \"image/webp\")"
+        },
+        "maxFileSize": {
+          "type": "string",
+          "format": "int64",
+          "title": "Maximum allowed size of the file in bytes (will be enforced by storage)"
+        },
+        "path": {
+          "type": "string",
+          "title": "Optional: Path/Folder where the file should be uploaded (e.g., \"users/avatars\")"
+        },
+        "fileName": {
+          "type": "string",
+          "description": "Optional: Exact filename to use. If not provided, a unique UUID will be generated."
+        }
+      },
+      "title": "PresignUploadRequest contains the parameters for generating a presigned upload URL"
+    },
+    "v1PresignUploadResponse": {
+      "type": "object",
+      "properties": {
+        "presignedUrl": {
+          "type": "string",
+          "title": "Presigned URL for uploading the file"
+        },
+        "objectKey": {
+          "type": "string",
+          "title": "Object key/path in storage"
+        },
+        "expiresIn": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Expiration time in seconds"
+        },
+        "formData": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Optional: Form data fields for POST upload (required for size enforcement)"
+        }
+      },
+      "title": "PresignUploadResponse contains the presigned URL and metadata"
+    }
+  }
+}

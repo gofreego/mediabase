@@ -1,0 +1,23 @@
+version: v1
+plugins:
+  - plugin: go
+    out: ./
+  
+  - plugin: go-grpc
+    out: ./
+  
+  - plugin: grpc-gateway
+    out: ./
+    opt:
+      - generate_unbound_methods=true
+  
+  - plugin: openapiv2
+    out: docs
+
+  - plugin: validate
+    out: ./
+    opt:
+      - lang=go
+
+  # - plugin: buf.build/protocolbuffers/dart:v21.1.2
+  #   out: ../ui/lib/src/

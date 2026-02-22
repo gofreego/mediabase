@@ -1,0 +1,28 @@
+LogConfig: true
+Logger:
+  AppName: mediabase
+  Build: dev
+  Level: debug
+AppNames:
+- HTTP_SERVER
+- GRPC_SERVER
+Server:
+  GRPCPort: 8096
+  HTTPPort: 8095
+Repository:
+  Name : memory
+Service:
+  MaxFileSize: 5242880 # 5MB in bytes
+  AllowedContentTypes:
+    - image/jpeg
+    - image/png
+    - image/webp
+Storage:
+  Endpoint: "127.0.0.1:9900"
+  AccessKeyID: "minioadmin"
+  SecretAccessKey: "minioadmin"
+  Region: "us-east-1"
+  UseSSL: false
+Debug:
+  Enabled: true
+  EnablePprof: true

@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mediabase — API Test Console</title>
+  <meta name="description"
+    content="Interactive test console for the Mediabase presigned upload/download API backed by MinIO." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --accent2: #3fb950;
+      --danger: #f85149;
+      --warn: #d29922;
+      --radius: 12px;
+      --font: 'Inter', system-ui, sans-serif;
+      --mono: 'Fira Code', monospace;
+      --transition: 0.2s ease;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--accent), #1f6feb);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    header p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .badge {
+      margin-left: auto;
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--accent2);
+      border: 1px solid rgba(63, 185, 80, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 36px 24px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ── Config bar ── */
+    .config-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: flex-end;
+    }
+
+    .config-bar .field {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      padding: 9px 13px;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    .step-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-badge.blue {
+      background: rgba(88, 166, 255, 0.2);
+      color: var(--accent);
+      border: 1px solid rgba(88, 166, 255, 0.4);
+    }
+
+    .step-badge.green {
+      background: rgba(63, 185, 80, 0.2);
+      color: var(--accent2);
+      border: 1px solid rgba(63, 185, 80, 0.4);
+    }
+
+    .step-badge.red {
+      background: rgba(248, 81, 73, 0.2);
+      color: var(--danger);
+      border: 1px solid rgba(248, 81, 73, 0.4);
+    }
+
+    .step-badge.warn {
+      background: rgba(210, 153, 34, 0.2);
+      color: var(--warn);
+      border: 1px solid rgba(210, 153, 34, 0.4);
+    }
+
+    .card-header h2 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .card-header small {
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-left: auto;
+      font-family: var(--mono);
+    }
+
+    .card-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* ── Drop zone ── */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      position: relative;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.dragging {
+      border-color: var(--accent);
+      background: rgba(88, 166, 255, 0.05);
+    }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .drop-zone .dz-icon {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+
+    .drop-zone p {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .drop-zone p span {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .drop-zone .file-name {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      font-family: var(--mono);
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: 8px;
+      border: none;
+      font-family: var(--font);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      letter-spacing: 0.01em;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1f6feb, var(--accent));
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(88, 166, 255, 0.25);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(88, 166, 255, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #238636, var(--accent2));
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(63, 185, 80, 0.25);
+    }
+
+    .btn-success:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(63, 185, 80, 0.4);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #b91c1c, var(--danger));
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(248, 81, 73, 0.25);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(248, 81, 73, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--border);
+    }
+
+    /* ── Progress bar ── */
+    .progress-wrap {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .progress-wrap.visible {
+      display: flex;
+    }
+
+    .progress-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .progress-bar-outer {
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar-inner {
+      height: 100%;
+      width: 0%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #1f6feb, var(--accent));
+      transition: width 0.25s ease;
+    }
+
+    /* ── Key-value info ── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+    }
+
+    .info-row .key {
+      color: var(--muted);
+      min-width: 110px;
+      flex-shrink: 0;
+      font-weight: 500;
+    }
+
+    .info-row .val {
+      font-family: var(--mono);
+      color: var(--text);
+      word-break: break-all;
+    }
+
+    /* ── Log panel ── */
+    .log-panel {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      max-height: 180px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .log-entry {
+      display: flex;
+      gap: 10px;
+    }
+
+    .log-entry .ts {
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .log-entry.info .msg {
+      color: var(--text);
+    }
+
+    .log-entry.ok .msg {
+      color: var(--accent2);
+    }
+
+    .log-entry.err .msg {
+      color: var(--danger);
+    }
+
+    .log-entry.warn .msg {
+      color: var(--warn);
+    }
+
+    /* ── Preview ── */
+    .img-preview {
+      display: none;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      max-height: 280px;
+    }
+
+    .img-preview.visible {
+      display: block;
+    }
+
+    .img-preview img {
+      width: 100%;
+      object-fit: contain;
+      max-height: 280px;
+      display: block;
+      background: #000;
+    }
+
+    /* ── Row layouts ── */
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .row .btn {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    /* ── Copy tooltip ── */
+    .copy-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 0.8rem;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color var(--transition);
+    }
+
+    .copy-btn:hover {
+      color: var(--accent);
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    select option {
+      background: var(--surface2);
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 20px 18px;
+        flex-wrap: wrap;
+      }
+
+      .badge {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo-icon">🗄️</div>
+    <div>
+      <h1>Mediabase API Test Console</h1>
+      <p>Upload → MinIO (via presigned URL) → Fetch with signed URL</p>
+    </div>
+    <div class="badge" id="serverStatus">● Checking…</div>
+  </header>
+
+  <div class="container">
+
+    <!-- Config -->
+    <div class="config-bar">
+      <div class="field">
+        <label for="apiBase">API Base URL</label>
+        <input type="text" id="apiBase" value="http://localhost:8085" />
+      </div>
+      <div class="field">
+        <label for="bucketName">Default Bucket</label>
+        <input type="text" id="bucketName" value="mediatest" placeholder="e.g. mediatest" />
+      </div>
+      <div class="field">
+        <label for="uploadPath">Upload Path</label>
+        <input type="text" id="uploadPath" value="uploads" placeholder="e.g. users/avatars" />
+      </div>
+      <div class="field" style="flex:0; min-width:120px;">
+        <label>&nbsp;</label>
+        <button class="btn btn-secondary" onclick="pingServer()">🔍 Ping</button>
+      </div>
+    </div>
+
+    <!-- Step 1: Request Presigned URL -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-badge blue">1</div>
+        <h2>Step 1: Get Presigned Policy</h2>
+        <small>POST /api/upload/presign/upload</small>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="field">
+            <label for="reqContentType">Content Type</label>
+            <select id="reqContentType">
+              <option value="image/jpeg" selected>image/jpeg</option>
+              <option value="image/png">image/png</option>
+              <option value="image/webp">image/webp</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="reqMaxSize">Max Allowed Size (Bytes)</label>
+            <input type="number" id="reqMaxSize" value="5242880" />
+          </div>
+          <div class="field">
+            <label for="reqFileName">Custom Filename (Optional)</label>
+            <input type="text" id="reqFileName" placeholder="e.g. avatar.jpg" />
+          </div>
+        </div>
+
+        <div class="info-grid" id="presignStepResult" style="display:none; margin-top: 10px;">
+          <div class="info-row">
+            <span class="key">Object Key</span>
+            <span class="val" id="rObjectKey">—</span>
+          </div>
+          <div class="info-row">
+            <span class="key">Presigned URL</span>
+            <span class="val" id="rPresignedUrl" style="font-size:0.7rem;">—</span>
+          </div>
+          <div class="info-row">
+            <span class="key">Form Data</span>
+            <span class="val" id="rFormData"
+              style="font-family: var(--mono); font-size: 0.7rem; white-space: pre-wrap; opacity: 0.8;">—</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="btn btn-primary" onclick="doGetPresignedPolicy()">
+            🔑 Request Policy
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Perform Upload -->
+    <div class="card" id="uploadStepCard" style="opacity: 0.5; pointer-events: none;">
+      <div class="card-header">
+        <div class="step-badge blue">2</div>
+        <h2>Step 2: Select &amp; Upload File</h2>
+        <small>Using Generated Policy</small>
+      </div>
+      <div class="card-body">
+        <div class="drop-zone" id="dropZone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)"
+          ondrop="handleDrop(event)">
+          <input type="file" id="fileInput" onchange="handleFileSelect(event)" />
+          <div class="dz-icon">📁</div>
+          <p>Drag &amp; drop file here or <span>browse</span></p>
+          <div class="file-name" id="selectedFileName"></div>
+        </div>
+
+        <div class="progress-wrap" id="uploadProgressWrap">
+          <div class="progress-label"><span id="uploadProgressLabel">Uploading…</span><span
+              id="uploadProgressPct">0%</span></div>
+          <div class="progress-bar-outer">
+            <div class="progress-bar-inner" id="uploadProgressBar"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="btn btn-success" id="btnUpload" onclick="doPerformUpload()" disabled>
+            🚀 Start Upload
+          </button>
+          <button class="btn btn-secondary" onclick="clearUpload()">✕ Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Presign Download -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-badge green">2</div>
+        <h2>Get Presigned Download URL</h2>
+        <small>POST /api/upload/presign/download</small>
+      </div>
+      <div class="card-body">
+
+        <div>
+          <label for="downloadKey">Object Key</label>
+          <input type="text" id="downloadKey" placeholder="uploads/uuid.jpg" />
+        </div>
+
+        <div class="info-grid" id="downloadResult" style="display:none;">
+          <div class="info-row">
+            <span class="key">Signed URL</span>
+            <span class="val" id="rSignedUrl" style="font-size:0.7rem; word-break:break-all;">—</span>
+            <button class="copy-btn" onclick="copyText('rSignedUrl')" title="Copy">📋</button>
+          </div>
+          <div class="info-row">
+            <span class="key">Expires In</span>
+            <span class="val" id="rDownloadExpiry">—</span>
+          </div>
+        </div>
+
+        <div class="img-preview" id="imgPreviewBox">
+          <img id="imgPreview" src="" alt="Preview" />
+        </div>
+
+        <div class="row">
+          <button class="btn btn-success" onclick="doPresignDownload()">🔗 Get Signed URL</button>
+          <button class="btn btn-secondary" onclick="doFetchAndPreview()" id="btnPreview" disabled>🖼️ Fetch &amp;
+            Preview</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Step 3: Delete -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-badge red">3</div>
+        <h2>Delete Object</h2>
+        <small>DELETE /api/upload/object/{objectKey}</small>
+      </div>
+      <div class="card-body">
+
+        <div>
+          <label for="deleteKey">Object Key</label>
+          <input type="text" id="deleteKey" placeholder="uploads/uuid.jpg" />
+        </div>
+
+        <div class="info-grid" id="deleteResult" style="display:none;">
+          <div class="info-row">
+            <span class="key">Success</span>
+            <span class="val" id="rDeleteSuccess">—</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="btn btn-danger" onclick="doDelete()">🗑️ Delete Object</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Activity Log -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-badge warn">📋</div>
+        <h2>Activity Log</h2>
+        <button class="copy-btn"
+          style="margin-left:auto; font-size:0.78rem; color:var(--muted); background:var(--surface); border:1px solid var(--border); padding:4px 10px; border-radius:6px; cursor:pointer;"
+          onclick="clearLog()">Clear</button>
+      </div>
+      <div class="card-body" style="padding-top:0; padding-bottom:16px;">
+        <div class="log-panel" id="logPanel">
+          <div class="log-entry info"><span class="ts">--:--:--</span><span class="msg">Console ready. Fill in API Base
+              URL and press Ping to start.</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── State ──────────────────────────────────────────────
+    let selectedFile = null;
+    let lastObjectKey = null;
+    let lastSignedUrl = null;
+    let currentPolicy = null;    // Stores the formData fields from the API
+    let currentUploadUrl = null;   // Stores the presignedUrl from the API
+
+    // ── Logging ────────────────────────────────────────────
+    function log(msg, type = 'info') {
+      const panel = document.getElementById('logPanel');
+      const now = new Date().toTimeString().slice(0, 8);
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.innerHTML = `<span class="ts">${now}</span><span class="msg">${escapeHtml(msg)}</span>`;
+      panel.appendChild(entry);
+      panel.scrollTop = panel.scrollHeight;
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    function clearLog() {
+      document.getElementById('logPanel').innerHTML = '';
+    }
+
+    // ── Helpers ────────────────────────────────────────────
+    function apiBase() {
+      return document.getElementById('apiBase').value.replace(/\/$/, '');
+    }
+
+    function getBucket() {
+      return document.getElementById('bucketName').value.trim();
+    }
+
+    function getPath() {
+      return document.getElementById('uploadPath').value.trim();
+    }
+
+    function copyText(id) {
+      const el = document.getElementById(id);
+      navigator.clipboard.writeText(el.textContent).then(() => log(`Copied: ${el.textContent.slice(0, 60)}…`, 'ok'));
+    }
+
+    function setServerStatus(ok, label) {
+      const el = document.getElementById('serverStatus');
+      el.textContent = `● ${label}`;
+      el.style.background = ok ? 'rgba(63,185,80,0.15)' : 'rgba(248,81,73,0.15)';
+      el.style.color = ok ? 'var(--accent2)' : 'var(--danger)';
+      el.style.borderColor = ok ? 'rgba(63,185,80,0.3)' : 'rgba(248,81,73,0.3)';
+    }
+
+    // ── Ping ───────────────────────────────────────────────
+    async function pingServer() {
+      log('Pinging server…');
+      try {
+        const res = await fetch(`${apiBase()}/mediabase/v1/ping?message=hello`);
+        const data = await res.json();
+        if (res.ok) {
+          log(`Pong: ${JSON.stringify(data)}`, 'ok');
+          setServerStatus(true, 'Online');
+        } else {
+          log(`Ping error ${res.status}: ${JSON.stringify(data)}`, 'err');
+          setServerStatus(false, 'Error');
+        }
+      } catch (e) {
+        log(`Ping failed: ${e.message}`, 'err');
+        setServerStatus(false, 'Offline');
+      }
+    }
+
+    // ── File selection ─────────────────────────────────────
+    function handleFileSelect(e) {
+      setFile(e.target.files[0]);
+    }
+    function handleDragOver(e) {
+      e.preventDefault();
+      document.getElementById('dropZone').classList.add('dragging');
+    }
+    function handleDragLeave(e) {
+      document.getElementById('dropZone').classList.remove('dragging');
+    }
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('dropZone').classList.remove('dragging');
+      if (e.dataTransfer.files.length) setFile(e.dataTransfer.files[0]);
+    }
+    function setFile(file) {
+      if (!file) return;
+      selectedFile = file;
+      document.getElementById('selectedFileName').textContent = `📁 ${file.name} (${(file.size / 1024).toFixed(1)} KB · ${file.type})`;
+      document.getElementById('btnUpload').disabled = false;
+      log(`File selected: ${file.name} (${file.type}, ${(file.size / 1024).toFixed(1)} KB)`);
+    }
+
+    function clearUpload() {
+      selectedFile = null;
+      document.getElementById('fileInput').value = '';
+      document.getElementById('selectedFileName').textContent = '';
+      document.getElementById('btnUpload').disabled = true;
+      document.getElementById('uploadProgressWrap').classList.remove('visible');
+      log('Cleared upload selection.');
+    }
+
+    // ── Step 1: Request Presigned Policy ───────────────────
+    async function doGetPresignedPolicy() {
+      console.log('doGetPresignedPolicy clicked');
+      const contentType = document.getElementById('reqContentType').value;
+      const maxSize = parseInt(document.getElementById('reqMaxSize').value) || 0;
+      const fileName = document.getElementById('reqFileName').value.trim();
+
+      log(`Requesting presigned policy for ${contentType} (max ${maxSize} bytes)…`);
+
+      try {
+        const payload = {
+          bucket_name: getBucket(),
+          content_type: contentType,
+          max_file_size: maxSize,
+          path: getPath(),
+          file_name: fileName
+        };
+
+        const res = await fetch(`${apiBase()}/api/upload/presign/upload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || res.statusText);
+
+        // Debug: log properties to console
+        console.log('API Response:', data);
+
+        currentPolicy = data.form_data || data.formData;
+        currentUploadUrl = data.presigned_url || data.presignedUrl;
+        lastObjectKey = data.object_key || data.objectKey;
+
+        // Display results
+        document.getElementById('rObjectKey').textContent = lastObjectKey;
+        document.getElementById('rPresignedUrl').textContent = currentUploadUrl;
+        document.getElementById('rFormData').textContent = JSON.stringify(currentPolicy, null, 2);
+        document.getElementById('presignStepResult').style.display = 'grid';
+
+        // Pre-fill downstream fields
+        document.getElementById('downloadKey').value = lastObjectKey;
+        document.getElementById('deleteKey').value = lastObjectKey;
+
+        // Enable Next Step
+        const step2 = document.getElementById('uploadStepCard');
+        step2.style.opacity = '1';
+        step2.style.pointerEvents = 'auto';
+
+        log(`Policy obtained successfully for ${lastObjectKey}`, 'ok');
+      } catch (e) {
+        log(`Presign request failed: ${e.message}`, 'err');
+      }
+    }
+
+    // ── Step 2: Perform Upload ───────────────────────────
+    async function doPerformUpload() {
+      log('Start Upload button clicked…');
+      console.log('doPerformUpload clicked');
+      console.log('State:', { selectedFile, currentUploadUrl, currentPolicy });
+
+      if (!selectedFile) { log('No file selected.', 'warn'); return; }
+      if (!currentUploadUrl) {
+        log('No active upload policy. Go back to Step 1.', 'warn');
+        console.error('Missing currentUploadUrl');
+        return;
+      }
+
+      log(`Preparing to send to: ${currentUploadUrl.slice(0, 100)}…`);
+      const isPost = currentPolicy && Object.keys(currentPolicy).length > 0;
+      log(`Starting ${isPost ? 'POST' : 'PUT'} upload of ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)…`);
+
+      const progressWrap = document.getElementById('uploadProgressWrap');
+      const progressBar = document.getElementById('uploadProgressBar');
+      const progressPct = document.getElementById('uploadProgressPct');
+      const progressLbl = document.getElementById('uploadProgressLabel');
+
+      if (progressWrap) progressWrap.classList.add('visible');
+      if (progressLbl) progressLbl.textContent = 'Uploading to MinIO…';
+
+      try {
+        await new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          let payload;
+
+          if (isPost) {
+            console.log('Preparing POST FormData upload');
+            // POST Upload (S3/MinIO Policy requires fields BEFORE the file)
+            const fd = new FormData();
+            for (const [key, value] of Object.entries(currentPolicy)) {
+              fd.append(key, value);
+            }
+            fd.append('file', selectedFile);
+
+            xhr.open('POST', currentUploadUrl, true);
+            payload = fd;
+          } else {
+            console.log('Preparing PUT upload');
+            // Fallback PUT Upload
+            xhr.open('PUT', currentUploadUrl, true);
+            xhr.setRequestHeader('Content-Type', selectedFile.type);
+            payload = selectedFile;
+          }
+
+          xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+              const pct = Math.round((e.loaded / e.total) * 100);
+              progressBar.style.width = pct + '%';
+              progressPct.textContent = pct + '%';
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) resolve();
+            else reject(new Error(`MinIO Upload failed: HTTP ${xhr.status} — ${xhr.responseText.slice(0, 200)}`));
+          };
+          xhr.onerror = () => reject(new Error('Network error during upload.'));
+
+          xhr.send(payload);
+        });
+
+        progressBar.style.background = 'linear-gradient(90deg, #238636, var(--accent2))';
+        progressLbl.textContent = '✅ Upload complete';
+        progressPct.textContent = '100%';
+        log(`File uploaded successfully. objectKey=${lastObjectKey}`, 'ok');
+
+      } catch (e) {
+        progressLbl.textContent = '❌ Upload failed';
+        progressBar.style.background = 'var(--danger)';
+        log(`Upload failed: ${e.message}`, 'err');
+      }
+    }
+
+    // ── Step 2a: Presign Download ──────────────────────────
+    async function doPresignDownload() {
+      const key = document.getElementById('downloadKey').value.trim();
+      if (!key) { log('Object key is required for download presign.', 'warn'); return; }
+
+      log(`Requesting presigned download URL for ${key}…`);
+      try {
+        const res = await fetch(`${apiBase()}/api/upload/presign/download`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bucket_name: getBucket(),
+            object_key: key
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || res.statusText);
+
+        const { presignedUrl, expiresIn } = data;
+        lastSignedUrl = presignedUrl;
+
+        document.getElementById('rSignedUrl').textContent = presignedUrl;
+        document.getElementById('rDownloadExpiry').textContent = `${expiresIn}s`;
+        document.getElementById('downloadResult').style.display = 'grid';
+        document.getElementById('btnPreview').disabled = false;
+
+        log(`Presigned download URL obtained. expires=${expiresIn}s`, 'ok');
+      } catch (e) {
+        log(`Presign download failed: ${e.message}`, 'err');
+      }
+    }
+
+    // ── Step 2b: Fetch & Preview ───────────────────────────
+    async function doFetchAndPreview() {
+      if (!lastSignedUrl) { log('Get a presigned download URL first.', 'warn'); return; }
+      log(`Fetching image from MinIO via signed URL…`);
+      try {
+        const res = await fetch(lastSignedUrl);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const img = document.getElementById('imgPreview');
+        img.src = url;
+        document.getElementById('imgPreviewBox').classList.add('visible');
+        log(`Image fetched and previewed (${(blob.size / 1024).toFixed(1)} KB, type=${blob.type})`, 'ok');
+      } catch (e) {
+        log(`Fetch failed: ${e.message}`, 'err');
+      }
+    }
+
+    // ── Step 3: Delete ─────────────────────────────────────
+    async function doDelete() {
+      const key = document.getElementById('deleteKey').value.trim();
+      if (!key) { log('Object key is required for deletion.', 'warn'); return; }
+      if (!confirm(`Delete object "${key}"? This cannot be undone.`)) return;
+
+      log(`Deleting object: ${key}…`);
+      try {
+        // The proto route is DELETE /api/upload/object/{object_key}
+        // object_key contains a slash (uploads/uuid.jpg) so encode it appropriately
+        const encodedKey = key.split('/').map(encodeURIComponent).join('/');
+        const bucket = getBucket();
+
+        const res = await fetch(`${apiBase()}/api/upload/object/${encodedKey}?bucket_name=${encodeURIComponent(bucket)}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || res.statusText);
+
+        document.getElementById('rDeleteSuccess').textContent = data.success ? '✅ true' : '⚠️ false';
+        document.getElementById('deleteResult').style.display = 'grid';
+        log(`Object deleted. success=${data.success}`, data.success ? 'ok' : 'warn');
+      } catch (e) {
+        log(`Delete failed: ${e.message}`, 'err');
+      }
+    }
+
+    // ── Auto-ping on load ──────────────────────────────────
+    window.addEventListener('load', () => {
+      pingServer();
+    });
+  </script>
+</body>
+
+</html>

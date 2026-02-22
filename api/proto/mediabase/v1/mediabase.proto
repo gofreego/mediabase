@@ -1,0 +1,173 @@
+syntax = "proto3";
+package v1;
+
+option go_package = "./mediabase_v1";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "proto/common/ping.proto";
+import "validate/validate.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "mediabase API"
+    version: "v1.0.0"
+    description: "mediabase is a generic media storage service supporting presigned uploads and downloads."
+  }
+  tags: [
+    {
+      name: "Ping"
+      description: "Health check endpoints"
+    },
+    {
+      name: "Upload"
+      description: "Media upload and management endpoints"
+    }
+  ]
+};
+
+service MediabaseService {
+    
+    // Ping is a simple GET request that returns a Pong message.
+    rpc Ping (PingRequest) returns (PingResponse) {
+        option (google.api.http) = {
+            get: "/mediabase/v1/ping"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Ping"
+            summary: "Ping the server"
+            description: "Check if the server is alive."
+        };
+    }
+
+    // PresignUpload generates a presigned URL for uploading a file
+    rpc PresignUpload (PresignUploadRequest) returns (PresignUploadResponse) {
+        option (google.api.http) = {
+            post: "/api/upload/presign/upload"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Upload"
+            summary: "Generate presigned upload URL"
+            description: "Returns a presigned URL for uploading a file directly to storage."
+        };
+    }
+
+    // PresignDownload generates a presigned URL for downloading a file
+    rpc PresignDownload (PresignDownloadRequest) returns (PresignDownloadResponse) {
+        option (google.api.http) = {
+            post: "/api/upload/presign/download"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Upload"
+            summary: "Generate presigned download URL"
+            description: "Returns a presigned URL for downloading a file from storage."
+        };
+    }
+
+    // DeleteObject deletes a file from storage
+    rpc DeleteObject (DeleteObjectRequest) returns (DeleteObjectResponse) {
+        option (google.api.http) = {
+            delete: "/api/upload/object/{object_key}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Upload"
+            summary: "Delete object"
+            description: "Deletes a file from storage."
+        };
+    }
+
+    // CreateBucket creates a bucket and optionally sets it to public read
+    rpc CreateBucket (CreateBucketRequest) returns (CreateBucketResponse) {
+        option (google.api.http) = {
+            post: "/api/upload/bucket"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Upload"
+            summary: "Create bucket"
+            description: "Creates a bucket and optionally sets its policy to allow public read access while keeping uploads private (via presigned URLs)."
+        };
+    }
+}
+
+// CreateBucketRequest contains the bucket name and public access preference
+message CreateBucketRequest {
+    string bucket_name = 1 [(validate.rules).string.min_len = 1];
+    bool is_public = 2;
+}
+
+// CreateBucketResponse indicates successful creation
+message CreateBucketResponse {
+    bool success = 1;
+}
+
+// PresignUploadRequest contains the parameters for generating a presigned upload URL
+message PresignUploadRequest {
+    // Bucket name where the file should be uploaded
+    string bucket_name = 1 [(validate.rules).string.min_len = 1];
+
+    // Content type of the file (e.g., "image/jpeg", "image/png", "image/webp")
+    string content_type = 2 [(validate.rules).string.min_len = 1];
+    
+    // Maximum allowed size of the file in bytes (will be enforced by storage)
+    int64 max_file_size = 3 [(validate.rules).int64 = {
+        gt: 0
+    }];
+
+    // Optional: Path/Folder where the file should be uploaded (e.g., "users/avatars")
+    string path = 4;
+
+    // Optional: Exact filename to use. If not provided, a unique UUID will be generated.
+    string file_name = 5;
+}
+
+// PresignUploadResponse contains the presigned URL and metadata
+message PresignUploadResponse {
+    // Presigned URL for uploading the file
+    string presigned_url = 1;
+    
+    // Object key/path in storage
+    string object_key = 2;
+    
+    // Expiration time in seconds
+    int32 expires_in = 3;
+
+    // Optional: Form data fields for POST upload (required for size enforcement)
+    map<string, string> form_data = 4;
+}
+
+// PresignDownloadRequest contains the object key for download
+message PresignDownloadRequest {
+    // Bucket name where the file is stored
+    string bucket_name = 1 [(validate.rules).string.min_len = 1];
+
+    // Object key/path in storage
+    string object_key = 2 [(validate.rules).string.min_len = 1];
+}
+
+// PresignDownloadResponse contains the presigned download URL
+message PresignDownloadResponse {
+    // Presigned URL for downloading the file
+    string presigned_url = 1;
+    
+    // Expiration time in seconds
+    int32 expires_in = 2;
+}
+
+// DeleteObjectRequest contains the object key to delete
+message DeleteObjectRequest {
+    // Bucket name where the file is stored
+    string bucket_name = 1 [(validate.rules).string.min_len = 1];
+
+    // Object key/path in storage
+    string object_key = 2 [(validate.rules).string.min_len = 1];
+}
+
+// DeleteObjectResponse indicates successful deletion
+message DeleteObjectResponse {
+    // Whether the deletion was successful
+    bool success = 1;
+}
+

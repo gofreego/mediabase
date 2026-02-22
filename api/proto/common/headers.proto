@@ -1,0 +1,20 @@
+syntax = "proto3";
+package v1;
+
+option go_package = "./mediabase_v1";
+
+// Common header fields for authentication and client identification
+// These headers are used across all API requests for authentication and tracking
+message RequestHeaders {
+    // JWT authentication token (Bearer token)
+    // Should be provided in Authorization header as "Bearer <token>"
+    optional string authorization = 1;
+    
+    // Client identifier for tracking and analytics
+    // Used to identify the calling application or service
+    optional string x_client_id = 2;
+    
+    // Client version for compatibility and feature tracking
+    // Used to track client versions and handle backward compatibility
+    optional string x_client_version = 3;
+}
