@@ -18,11 +18,11 @@ Service:
     - image/png
     - image/webp
 Storage:
-  Endpoint: "https://media.zshala.com"
+  Endpoint: "media.zshala.com"
   AccessKeyID: "minioadmin"
   SecretAccessKey: "minioadmin"
   Region: "us-east-1"
-  UseSSL: false
+  UseSSL: true
 Debug:
   Enabled: true
   EnablePprof: true
