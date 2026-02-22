@@ -20,6 +20,18 @@ services:
       timeout: 20s
       retries: 3
 
+  mediabase:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mediabase
+    ports:
+      - "8095:8095"  # HTTP Server
+      - "8096:8096"  # gRPC Server
+    depends_on:
+      minio:
+        condition: service_healthy
+
 volumes:
   minio_data:
     driver: local
