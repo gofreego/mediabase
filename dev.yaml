@@ -18,7 +18,7 @@ Service:
     - image/png
     - image/webp
 Storage:
-  Endpoint: "192.168.1.100:9900"
+  Endpoint: "https://media.zshala.com"
   AccessKeyID: "minioadmin"
   SecretAccessKey: "minioadmin"
   Region: "us-east-1"
