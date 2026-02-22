@@ -1,16 +1,43 @@
-FROM alpine:latest
+# Build stage
+FROM golang:1.24-alpine AS builder
 
-# Set your working directory (optional)
+# Set working directory
 WORKDIR /app
 
-# Install any additional packages (replace with your needs)
-COPY application .
-COPY dev.yaml .
-COPY api/docs /app/api/docs
-RUN chmod +x application
+# Install build dependencies
+RUN apk add --no-cache git
 
-# Expose the ports the application uses
-EXPOSE 8085 8086
+# Copy go.mod and go.sum files
+COPY go.mod go.sum ./
 
-# Define the command to run your application
-CMD [ "/app/application" ]
+# Download dependencies
+RUN go mod download
+
+# Copy the entire project
+COPY . .
+
+# Build the application
+# CGO_ENABLED=0 creates a statically linked binary
+RUN CGO_ENABLED=0 GOOS=linux go build -o application .
+
+# Final stage
+FROM alpine:latest
+
+# Set working directory
+WORKDIR /app
+
+# Install certificates for HTTPS requests if needed
+RUN apk add --no-cache ca-certificates
+
+# Copy the binary from the builder
+COPY --from=builder /app/application .
+
+# Copy configuration and resources
+COPY --from=builder /app/dev.yaml .
+COPY --from=builder /app/api/docs ./api/docs
+
+# Expose ports
+EXPOSE 8095 8096
+
+# Run the application
+CMD ["/app/application"]
