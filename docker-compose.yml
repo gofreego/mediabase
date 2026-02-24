@@ -9,3 +9,4 @@ services:
     ports:
       - "8095:8095" # HTTP Server
       - "8096:8096" # gRPC Server
+    restart: always
