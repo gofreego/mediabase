@@ -35,3 +35,13 @@ setup:
 	@echo "Compiling proto files..."
 	sh ./api/protoc.sh
 	go mod tidy
+
+redeploy:
+	@echo "Pulling latest code from git"
+	git pull
+	@echo "Rebuilding the docker image with the latest code"
+	docker-compose build
+	@echo "Rebuilding and redeploying the service"
+	docker-compose down
+	docker-compose up -d
+	@echo "Service redeployed successfully"
