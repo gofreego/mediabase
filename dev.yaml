@@ -21,8 +21,8 @@ Storage:
   Endpoint: 192.168.1.100:9900
   AccessKeyID: "minioadmin"
   SecretAccessKey: "minioadmin"
-  Region: "us-east-1"
-  UseSSL: true
+  Region: ""
+  UseSSL: false
 Debug:
   Enabled: true
   EnablePprof: true
