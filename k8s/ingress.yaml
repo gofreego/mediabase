@@ -1,18 +1,17 @@
-# Pilot-only hostname for validating the ingress-nginx routing path end to
-# end (curl --resolve against the ingress-nginx LoadBalancer IP). Not a real
-# public domain and deliberately has no TLS/cert-manager annotation — HTTP-01
-# needs real public DNS + internet reachability, which this doesn't have.
-# Replace with the real production hostname (and add
-# cert-manager.io/cluster-issuer: letsencrypt-prod) when this service is
-# actually cut over.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: mediabase
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - media.zshala.com
+      secretName: media-zshala-com-tls
   rules:
-    - host: mediabase-pilot.bappaapp.internal
+    - host: media.zshala.com
       http:
         paths:
           - path: /
