@@ -1,0 +1,30 @@
+# media.zshala.com is actually MinIO's S3 API (port 9900 on the docker host),
+# not mediabase's own HTTP API — confirmed against
+# infra/docker/nginx/nginx/conf.d/mediabase.conf's proxy_pass. MinIO hasn't
+# been migrated to Kubernetes yet, so this Service+Endpoints pair lets
+# ingress-nginx proxy through to it at its existing LAN address (pure IP
+# routing, no external DNS dependency), the same way mediabase's own pod
+# already reaches MinIO for uploads (see dev.yaml's Storage.Endpoint).
+# Replace this with a real in-cluster Service if/when MinIO itself gets
+# migrated.
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-external
+spec:
+  ports:
+    - name: http
+      port: 9900
+
+---
+
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: minio-external
+subsets:
+  - addresses:
+      - ip: 192.168.1.100
+    ports:
+      - name: http
+        port: 9900

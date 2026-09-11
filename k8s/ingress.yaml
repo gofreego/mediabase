@@ -1,3 +1,8 @@
+# media.zshala.com -> MinIO (see minio-external.yaml), NOT the mediabase app
+# itself. mediabase generates presigned upload/download URLs that clients
+# use to talk to MinIO's S3 API directly — this hostname is that presigned-
+# URL target, matching what infra/docker/nginx/nginx/conf.d/mediabase.conf
+# already proxies to (192.168.1.100:9900).
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -18,6 +23,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: mediabase
+                name: minio-external
                 port:
                   name: http
