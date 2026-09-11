@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mediabase
+  labels:
+    app: mediabase
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mediabase
+  template:
+    metadata:
+      labels:
+        app: mediabase
+    spec:
+      containers:
+        - name: mediabase
+          image: 192.168.1.100:5000/mediabase:pilot
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8095
+            - name: grpc
+              containerPort: 8096
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
