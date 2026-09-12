@@ -11,6 +11,7 @@ import (
 	minioStorage "github.com/gofreego/mediabase/internal/storage/minio"
 
 	"github.com/gofreego/goutils/logger"
+	"github.com/gofreego/goutils/metrics"
 	"google.golang.org/grpc"
 )
 
@@ -48,7 +49,7 @@ func (a *GRPCServer) Run(ctx context.Context) error {
 	service := service.NewService(ctx, &a.cfg.Service, storage)
 
 	// Create a new gRPC server
-	a.server = grpc.NewServer()
+	a.server = grpc.NewServer(grpc.UnaryInterceptor(metrics.UnaryServerInterceptor()))
 
 	mediabase_v1.RegisterMediabaseServiceServer(a.server, service)
 
