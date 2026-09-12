@@ -37,7 +37,7 @@ COPY --from=builder /app/dev.yaml .
 COPY --from=builder /app/api/docs ./api/docs
 
 # Expose ports
-EXPOSE 8095 8096
+EXPOSE 80 8081
 
 # Run the application
 CMD ["/app/application"]

@@ -7,8 +7,8 @@ AppNames:
 - HTTP_SERVER
 - GRPC_SERVER
 Server:
-  GRPCPort: 8096
-  HTTPPort: 8095
+  GRPCPort: 8081
+  HTTPPort: 80
 Repository:
   Name : memory
 Service:
