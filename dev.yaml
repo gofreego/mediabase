@@ -18,7 +18,8 @@ Service:
     - image/png
     - image/webp
 Storage:
-  Endpoint: 192.168.1.100:9900
+  InternalHost: 192.168.1.100:9900
+  PublicHost: https://media.zshala.com
   AccessKeyID: "minioadmin"
   SecretAccessKey: "minioadmin"
   Region: ""

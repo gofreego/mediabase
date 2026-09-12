@@ -41,7 +41,7 @@ func (a *GRPCServer) Run(ctx context.Context) error {
 	}
 
 	// Initialize MinIO storage
-	storage, err := minioStorage.NewMinIOStorage(a.cfg.Storage)
+	storage, err := minioStorage.NewMinIOStorage(&a.cfg.Storage)
 	if err != nil {
 		logger.Panic(ctx, "failed to initialize storage: %v", err)
 	}

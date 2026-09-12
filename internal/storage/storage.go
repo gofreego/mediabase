@@ -95,7 +95,8 @@ type Storage interface {
 
 // Config holds common configuration for storage providers
 type Config struct {
-	Endpoint        string `yaml:"Endpoint"`
+	InternalHost    string `yaml:"InternalHost"`
+	PublicHost      string `yaml:"PublicHost"`
 	AccessKeyID     string `yaml:"AccessKeyID"`
 	SecretAccessKey string `yaml:"SecretAccessKey"`
 	Region          string `yaml:"Region"`

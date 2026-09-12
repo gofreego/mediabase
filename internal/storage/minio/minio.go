@@ -15,12 +15,13 @@ import (
 // MinIOStorage implements the Storage interface using MinIO
 type MinIOStorage struct {
 	client *minio.Client
+	cfg    *storage.Config
 }
 
 // NewMinIOStorage creates a new MinIO storage instance
-func NewMinIOStorage(config storage.Config) (*MinIOStorage, error) {
+func NewMinIOStorage(config *storage.Config) (*MinIOStorage, error) {
 	// Initialize MinIO client
-	minioClient, err := minio.New(config.Endpoint, &minio.Options{
+	minioClient, err := minio.New(config.InternalHost, &minio.Options{
 		Creds:  credentials.NewStaticV4(config.AccessKeyID, config.SecretAccessKey, ""),
 		Secure: config.UseSSL,
 		Region: config.Region,
@@ -32,6 +33,7 @@ func NewMinIOStorage(config storage.Config) (*MinIOStorage, error) {
 	minioClient.TraceOn(os.Stdout)
 	return &MinIOStorage{
 		client: minioClient,
+		cfg:    config,
 	}, nil
 }
 
@@ -58,8 +60,7 @@ func (m *MinIOStorage) GeneratePresignedUploadURL(ctx context.Context, bucketNam
 	for k, v := range formData {
 		fields[k] = v
 	}
-
-	return u.String(), fields, nil
+	return m.cfg.PublicHost + u.RequestURI(), fields, nil
 }
 
 // GeneratePresignedDownloadURL creates a presigned URL for downloading a file
@@ -70,7 +71,7 @@ func (m *MinIOStorage) GeneratePresignedDownloadURL(ctx context.Context, bucketN
 		return "", fmt.Errorf("failed to generate presigned download URL: %w", err)
 	}
 
-	return presignedURL.String(), nil
+	return m.cfg.PublicHost + presignedURL.RequestURI(), nil
 }
 
 // DeleteObject removes a file from storage
