@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: mediabase
-          image: ghcr.io/gofreego/mediabase:pilot-fb3f2ef
+          image: ghcr.io/gofreego/mediabase:pilot-65abd30
           imagePullPolicy: Always
           ports:
             - name: http
