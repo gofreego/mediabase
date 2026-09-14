@@ -12,11 +12,12 @@ Server:
 Repository:
   Name : memory
 Service:
-  MaxFileSize: 5242880 # 5MB in bytes
+  MaxFileSize: 52428800 # 50MB in bytes - raised from 5MB to fit uncompressed WAV audio clips
   AllowedContentTypes:
     - image/jpeg
     - image/png
     - image/webp
+    - audio/wav
 Storage:
   InternalHost: 192.168.1.100:9900
   PublicHost: https://media.zshala.com
