@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"time"
 
@@ -15,7 +16,15 @@ import (
 // MinIOStorage implements the Storage interface using MinIO
 type MinIOStorage struct {
 	client *minio.Client
-	cfg    *storage.Config
+	// publicClient is bound to cfg.PublicHost instead of cfg.InternalHost, and is used
+	// exclusively for presigning (GeneratePresignedDownloadURL/GeneratePresignedUploadURL).
+	// AWS SigV4 query-string signing (used for presigned GET URLs) binds the signature to
+	// the "host" the request is signed for; a client bound to the internal host produces a
+	// signature that fails verification once the request actually arrives via the public
+	// reverse proxy with a different Host header. Signing with a client already bound to
+	// the public host keeps the signed host and the request's actual Host header in sync.
+	publicClient *minio.Client
+	cfg          *storage.Config
 }
 
 // NewMinIOStorage creates a new MinIO storage instance
@@ -31,9 +40,25 @@ func NewMinIOStorage(config *storage.Config) (*MinIOStorage, error) {
 	}
 
 	minioClient.TraceOn(os.Stdout)
+
+	publicHost, useSSL := config.PublicHost, config.UseSSL
+	if u, err := url.Parse(config.PublicHost); err == nil && u.Host != "" {
+		publicHost = u.Host
+		useSSL = u.Scheme == "https"
+	}
+	publicClient, err := minio.New(publicHost, &minio.Options{
+		Creds:  credentials.NewStaticV4(config.AccessKeyID, config.SecretAccessKey, ""),
+		Secure: useSSL,
+		Region: config.Region,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create public-facing MinIO client: %w", err)
+	}
+
 	return &MinIOStorage{
-		client: minioClient,
-		cfg:    config,
+		client:       minioClient,
+		publicClient: publicClient,
+		cfg:          config,
 	}, nil
 }
 
@@ -49,8 +74,9 @@ func (m *MinIOStorage) GeneratePresignedUploadURL(ctx context.Context, bucketNam
 	// Enforce size limit at the storage level
 	policy.SetContentLengthRange(0, maxSize)
 
-	// Generate presigned POST URL and form fields
-	u, formData, err := m.client.PresignedPostPolicy(ctx, policy)
+	// Generate presigned POST URL and form fields, signed against the public host (see
+	// publicClient's doc comment) so the URL is correct regardless of signing scheme.
+	u, formData, err := m.publicClient.PresignedPostPolicy(ctx, policy)
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to generate presigned post policy: %w", err)
 	}
@@ -60,18 +86,19 @@ func (m *MinIOStorage) GeneratePresignedUploadURL(ctx context.Context, bucketNam
 	for k, v := range formData {
 		fields[k] = v
 	}
-	return m.cfg.PublicHost + u.RequestURI(), fields, nil
+	return u.String(), fields, nil
 }
 
 // GeneratePresignedDownloadURL creates a presigned URL for downloading a file
 func (m *MinIOStorage) GeneratePresignedDownloadURL(ctx context.Context, bucketName, objectKey string, expiryDuration time.Duration) (string, error) {
-	// Generate presigned GET URL
-	presignedURL, err := m.client.PresignedGetObject(ctx, bucketName, objectKey, expiryDuration, nil)
+	// Generate presigned GET URL, signed against the public host - see publicClient's doc
+	// comment for why this must not use the internal-host client.
+	presignedURL, err := m.publicClient.PresignedGetObject(ctx, bucketName, objectKey, expiryDuration, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate presigned download URL: %w", err)
 	}
 
-	return m.cfg.PublicHost + presignedURL.RequestURI(), nil
+	return presignedURL.String(), nil
 }
 
 // DeleteObject removes a file from storage
