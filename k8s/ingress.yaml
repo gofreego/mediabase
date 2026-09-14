@@ -1,14 +1,18 @@
 # media.zshala.com -> MinIO (see minio-external.yaml), NOT the mediabase app
 # itself. mediabase generates presigned upload/download URLs that clients
 # use to talk to MinIO's S3 API directly — this hostname is that presigned-
-# URL target, matching what infra/docker/nginx/nginx/conf.d/mediabase.conf
-# already proxies to (192.168.1.100:9900).
+# URL target.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: mediabase
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    # ingress-nginx defaults to 1m; presigned uploads (e.g. topic audio,
+    # up to 50MB per mediabase's own MaxFileSize config) need this raised
+    # to match, or nginx rejects the request with 413 before it ever
+    # reaches MinIO.
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
 spec:
   ingressClassName: nginx
   tls:
