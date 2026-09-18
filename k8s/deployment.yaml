@@ -18,11 +18,18 @@ spec:
         - name: mediabase
           image: ghcr.io/gofreego/mediabase:pilot-b0dd734
           imagePullPolicy: Always
+          args:
+            - -env=prod
+            - -path=/etc/mediabase/config
           ports:
             - name: http
               containerPort: 80
             - name: grpc
               containerPort: 8081
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mediabase/config
+              readOnly: true
           readinessProbe:
             tcpSocket:
               port: http
@@ -40,3 +47,10 @@ spec:
             limits:
               cpu: 250m
               memory: 256Mi
+      volumes:
+        - name: config
+          secret:
+            # Created out-of-band from the private configs-prod repo, not by
+            # anything in this repo's own manifests - see infra's
+            # mediabase-config-secret role.
+            secretName: mediabase-config

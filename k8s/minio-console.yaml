@@ -1,0 +1,52 @@
+# minio.zshala.com -> MinIO's web console (port 9001), for browsing buckets
+# etc. Distinct from media.zshala.com, which is MinIO's S3 API (port 9900)
+# used for presigned upload/download URLs — see minio-external.yaml.
+# Same pure-IP-routing approach: MinIO isn't in the cluster yet, so this
+# Service+Endpoints pair proxies to its existing LAN address.
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-console-external
+spec:
+  ports:
+    - name: http
+      port: 9001
+
+---
+
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: minio-console-external
+subsets:
+  - addresses:
+      - ip: 192.168.1.100
+    ports:
+      - name: http
+        port: 9001
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-console
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - minio.zshala.com
+      secretName: minio-zshala-com-tls
+  rules:
+    - host: minio.zshala.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio-console-external
+                port:
+                  name: http
