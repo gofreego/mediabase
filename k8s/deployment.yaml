@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: mediabase
-          image: ghcr.io/gofreego/mediabase:pilot-1be27cd
+          image: ghcr.io/gofreego/mediabase:pilot-aea76c4
           imagePullPolicy: Always
           command:
             - /app/application
