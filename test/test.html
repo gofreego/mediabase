@@ -555,7 +555,7 @@
       <div class="card-header">
         <div class="step-badge blue">1</div>
         <h2>Step 1: Get Presigned Policy</h2>
-        <small>POST /api/upload/presign/upload</small>
+        <small>POST /mediabase/v1/upload/presign/upload</small>
       </div>
       <div class="card-body">
         <div class="row">
@@ -639,7 +639,7 @@
       <div class="card-header">
         <div class="step-badge green">2</div>
         <h2>Get Presigned Download URL</h2>
-        <small>POST /api/upload/presign/download</small>
+        <small>POST /mediabase/v1/upload/presign/download</small>
       </div>
       <div class="card-body">
 
@@ -678,7 +678,7 @@
       <div class="card-header">
         <div class="step-badge red">3</div>
         <h2>Delete Object</h2>
-        <small>DELETE /api/upload/object/{objectKey}</small>
+        <small>DELETE /mediabase/v1/upload/object/{objectKey}</small>
       </div>
       <div class="card-body">
 
@@ -841,7 +841,7 @@
           file_name: fileName
         };
 
-        const res = await fetch(`${apiBase()}/api/upload/presign/upload`, {
+        const res = await fetch(`${apiBase()}/mediabase/v1/upload/presign/upload`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -962,7 +962,7 @@
 
       log(`Requesting presigned download URL for ${key}…`);
       try {
-        const res = await fetch(`${apiBase()}/api/upload/presign/download`, {
+        const res = await fetch(`${apiBase()}/mediabase/v1/upload/presign/download`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1013,12 +1013,12 @@
 
       log(`Deleting object: ${key}…`);
       try {
-        // The proto route is DELETE /api/upload/object/{object_key}
+        // The proto route is DELETE /mediabase/v1/upload/object/{object_key}
         // object_key contains a slash (uploads/uuid.jpg) so encode it appropriately
         const encodedKey = key.split('/').map(encodeURIComponent).join('/');
         const bucket = getBucket();
 
-        const res = await fetch(`${apiBase()}/api/upload/object/${encodedKey}?bucket_name=${encodeURIComponent(bucket)}`, {
+        const res = await fetch(`${apiBase()}/mediabase/v1/upload/object/${encodedKey}?bucket_name=${encodeURIComponent(bucket)}`, {
           method: 'DELETE'
         });
         const data = await res.json();

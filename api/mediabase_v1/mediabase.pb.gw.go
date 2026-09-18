@@ -236,7 +236,7 @@ func RegisterMediabaseServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/v1.MediabaseService/PresignUpload", runtime.WithHTTPPathPattern("/api/upload/presign/upload"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/v1.MediabaseService/PresignUpload", runtime.WithHTTPPathPattern("/mediabase/v1/upload/presign/upload"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -256,7 +256,7 @@ func RegisterMediabaseServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/v1.MediabaseService/PresignDownload", runtime.WithHTTPPathPattern("/api/upload/presign/download"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/v1.MediabaseService/PresignDownload", runtime.WithHTTPPathPattern("/mediabase/v1/upload/presign/download"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -276,7 +276,7 @@ func RegisterMediabaseServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/v1.MediabaseService/DeleteObject", runtime.WithHTTPPathPattern("/api/upload/object/{object_key}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/v1.MediabaseService/DeleteObject", runtime.WithHTTPPathPattern("/mediabase/v1/upload/object/{object_key}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -296,7 +296,7 @@ func RegisterMediabaseServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/v1.MediabaseService/CreateBucket", runtime.WithHTTPPathPattern("/api/upload/bucket"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/v1.MediabaseService/CreateBucket", runtime.WithHTTPPathPattern("/mediabase/v1/upload/bucket"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -371,7 +371,7 @@ func RegisterMediabaseServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/v1.MediabaseService/PresignUpload", runtime.WithHTTPPathPattern("/api/upload/presign/upload"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/v1.MediabaseService/PresignUpload", runtime.WithHTTPPathPattern("/mediabase/v1/upload/presign/upload"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -388,7 +388,7 @@ func RegisterMediabaseServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/v1.MediabaseService/PresignDownload", runtime.WithHTTPPathPattern("/api/upload/presign/download"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/v1.MediabaseService/PresignDownload", runtime.WithHTTPPathPattern("/mediabase/v1/upload/presign/download"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -405,7 +405,7 @@ func RegisterMediabaseServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/v1.MediabaseService/DeleteObject", runtime.WithHTTPPathPattern("/api/upload/object/{object_key}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/v1.MediabaseService/DeleteObject", runtime.WithHTTPPathPattern("/mediabase/v1/upload/object/{object_key}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -422,7 +422,7 @@ func RegisterMediabaseServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/v1.MediabaseService/CreateBucket", runtime.WithHTTPPathPattern("/api/upload/bucket"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/v1.MediabaseService/CreateBucket", runtime.WithHTTPPathPattern("/mediabase/v1/upload/bucket"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -440,10 +440,10 @@ func RegisterMediabaseServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 
 var (
 	pattern_MediabaseService_Ping_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"mediabase", "v1", "ping"}, ""))
-	pattern_MediabaseService_PresignUpload_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 1}, []string{"api", "upload", "presign"}, ""))
-	pattern_MediabaseService_PresignDownload_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "upload", "presign", "download"}, ""))
-	pattern_MediabaseService_DeleteObject_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "upload", "object", "object_key"}, ""))
-	pattern_MediabaseService_CreateBucket_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "upload", "bucket"}, ""))
+	pattern_MediabaseService_PresignUpload_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 2}, []string{"mediabase", "v1", "upload", "presign"}, ""))
+	pattern_MediabaseService_PresignDownload_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"mediabase", "v1", "upload", "presign", "download"}, ""))
+	pattern_MediabaseService_DeleteObject_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"mediabase", "v1", "upload", "object", "object_key"}, ""))
+	pattern_MediabaseService_CreateBucket_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"mediabase", "v1", "upload", "bucket"}, ""))
 )
 
 var (

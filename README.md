@@ -91,7 +91,7 @@ The service will start on:
 ### 1. Create Bucket
 Creates a bucket in storage and can optionally configure the bucket policy to allow public reads for downloads while keeping uploads strictly restricted.
 
-**POST** `/api/upload/bucket`
+**POST** `/mediabase/v1/upload/bucket`
 
 Request:
 ```json
@@ -111,7 +111,7 @@ Response:
 ### 2. Generate Presigned Upload Policy
 Returns a policy for secure uploads, allowing storage-level enforcement for file sizes and preventing unauthorized uploads.
 
-**POST** `/api/upload/presign/upload`
+**POST** `/mediabase/v1/upload/presign/upload`
 
 Request:
 ```json
@@ -144,7 +144,7 @@ Response:
 
 ### 3. Generate Presigned Download URL
 
-**POST** `/api/upload/presign/download`
+**POST** `/mediabase/v1/upload/presign/download`
 
 Request:
 ```json
@@ -164,7 +164,7 @@ Response:
 
 ### 4. Delete Object
 
-**DELETE** `/api/upload/object/{object_key}?bucket_name={bucket_name}`
+**DELETE** `/mediabase/v1/upload/object/{object_key}?bucket_name={bucket_name}`
 
 Response:
 ```json
@@ -218,14 +218,14 @@ A rich web-based interaction page is provided to visualize the granular 2-step u
 ## File Upload Flow
 
 1. **Client requests presigned upload policy**
-   - POST `/api/upload/presign/upload` with `bucket_name`, `content_type`, `max_file_size`, and optional `path` and `file_name`.
+   - POST `/mediabase/v1/upload/presign/upload` with `bucket_name`, `content_type`, `max_file_size`, and optional `path` and `file_name`.
    - Service generates the respective `object_key` and POST upload form policy (`form_data`).
 2. **Client uploads file directly to MinIO**
    - Client executes an HTTP POST to `presigned_url` (bucket endpoint) using multi-part `FormData`.
    - Append all keys from `form_data` into Form Data, followed by appending `file` containing actual content last.
    - Storage enforces file-type & dimension controls. No server involvement in actual network transfer.
 3. **Client can request presigned download URL**
-   - POST `/api/upload/presign/download` indicating `bucket_name` + `object_key`.
+   - POST `/mediabase/v1/upload/presign/download` indicating `bucket_name` + `object_key`.
    - Temporary signed URL generated.
 4. **Client downloads file directly from MinIO**
    - GET from `presigned_url`.

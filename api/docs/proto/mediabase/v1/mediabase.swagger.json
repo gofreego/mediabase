@@ -25,7 +25,40 @@
     "application/json"
   ],
   "paths": {
-    "/api/upload/bucket": {
+    "/mediabase/v1/ping": {
+      "get": {
+        "summary": "Ping the server",
+        "description": "Check if the server is alive.",
+        "operationId": "MediabaseService_Ping",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "message",
+            "description": "Message must be non-empty and between 1-100 characters",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Ping"
+        ]
+      }
+    },
+    "/mediabase/v1/upload/bucket": {
       "post": {
         "summary": "Create bucket",
         "description": "Creates a bucket and optionally sets its policy to allow public read access while keeping uploads private (via presigned URLs).",
@@ -59,7 +92,7 @@
         ]
       }
     },
-    "/api/upload/object/{objectKey}": {
+    "/mediabase/v1/upload/object/{objectKey}": {
       "delete": {
         "summary": "Delete object",
         "description": "Deletes a file from storage.",
@@ -99,7 +132,7 @@
         ]
       }
     },
-    "/api/upload/presign/download": {
+    "/mediabase/v1/upload/presign/download": {
       "post": {
         "summary": "Generate presigned download URL",
         "description": "Returns a presigned URL for downloading a file from storage.",
@@ -133,7 +166,7 @@
         ]
       }
     },
-    "/api/upload/presign/upload": {
+    "/mediabase/v1/upload/presign/upload": {
       "post": {
         "summary": "Generate presigned upload URL",
         "description": "Returns a presigned URL for uploading a file directly to storage.",
@@ -164,39 +197,6 @@
         ],
         "tags": [
           "Upload"
-        ]
-      }
-    },
-    "/mediabase/v1/ping": {
-      "get": {
-        "summary": "Ping the server",
-        "description": "Check if the server is alive.",
-        "operationId": "MediabaseService_Ping",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1PingResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "message",
-            "description": "Message must be non-empty and between 1-100 characters",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Ping"
         ]
       }
     }

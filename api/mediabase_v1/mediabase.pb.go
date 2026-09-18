@@ -531,18 +531,18 @@ const file_proto_mediabase_v1_mediabase_proto_rawDesc = "" +
 	"\n" +
 	"object_key\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\tobjectKey\"0\n" +
 	"\x14DeleteObjectResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\xf4\a\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\x98\b\n" +
 	"\x10MediabaseService\x12~\n" +
 	"\x04Ping\x12\x0f.v1.PingRequest\x1a\x10.v1.PingResponse\"S\x92A6\n" +
-	"\x04Ping\x12\x0fPing the server\x1a\x1dCheck if the server is alive.\x82\xd3\xe4\x93\x02\x14\x12\x12/mediabase/v1/ping\x12\xd9\x01\n" +
-	"\rPresignUpload\x12\x18.v1.PresignUploadRequest\x1a\x19.v1.PresignUploadResponse\"\x92\x01\x92Aj\n" +
-	"\x06Upload\x12\x1dGenerate presigned upload URL\x1aAReturns a presigned URL for uploading a file directly to storage.\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/upload/presign/upload\x12\xde\x01\n" +
-	"\x0fPresignDownload\x12\x1a.v1.PresignDownloadRequest\x1a\x1b.v1.PresignDownloadResponse\"\x91\x01\x92Ag\n" +
-	"\x06Upload\x12\x1fGenerate presigned download URL\x1a<Returns a presigned URL for downloading a file from storage.\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/api/upload/presign/download\x12\xa2\x01\n" +
-	"\fDeleteObject\x12\x17.v1.DeleteObjectRequest\x1a\x18.v1.DeleteObjectResponse\"_\x92A5\n" +
-	"\x06Upload\x12\rDelete object\x1a\x1cDeletes a file from storage.\x82\xd3\xe4\x93\x02!*\x1f/api/upload/object/{object_key}\x12\xfd\x01\n" +
-	"\fCreateBucket\x12\x17.v1.CreateBucketRequest\x1a\x18.v1.CreateBucketResponse\"\xb9\x01\x92A\x98\x01\n" +
-	"\x06Upload\x12\rCreate bucket\x1a\x7fCreates a bucket and optionally sets its policy to allow public read access while keeping uploads private (via presigned URLs).\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/upload/bucketB\xd8\x01\x92A\xc4\x01\x12q\n" +
+	"\x04Ping\x12\x0fPing the server\x1a\x1dCheck if the server is alive.\x82\xd3\xe4\x93\x02\x14\x12\x12/mediabase/v1/ping\x12\xe2\x01\n" +
+	"\rPresignUpload\x12\x18.v1.PresignUploadRequest\x1a\x19.v1.PresignUploadResponse\"\x9b\x01\x92Aj\n" +
+	"\x06Upload\x12\x1dGenerate presigned upload URL\x1aAReturns a presigned URL for uploading a file directly to storage.\x82\xd3\xe4\x93\x02(:\x01*\"#/mediabase/v1/upload/presign/upload\x12\xe7\x01\n" +
+	"\x0fPresignDownload\x12\x1a.v1.PresignDownloadRequest\x1a\x1b.v1.PresignDownloadResponse\"\x9a\x01\x92Ag\n" +
+	"\x06Upload\x12\x1fGenerate presigned download URL\x1a<Returns a presigned URL for downloading a file from storage.\x82\xd3\xe4\x93\x02*:\x01*\"%/mediabase/v1/upload/presign/download\x12\xab\x01\n" +
+	"\fDeleteObject\x12\x17.v1.DeleteObjectRequest\x1a\x18.v1.DeleteObjectResponse\"h\x92A5\n" +
+	"\x06Upload\x12\rDelete object\x1a\x1cDeletes a file from storage.\x82\xd3\xe4\x93\x02**(/mediabase/v1/upload/object/{object_key}\x12\x86\x02\n" +
+	"\fCreateBucket\x12\x17.v1.CreateBucketRequest\x1a\x18.v1.CreateBucketResponse\"\xc2\x01\x92A\x98\x01\n" +
+	"\x06Upload\x12\rCreate bucket\x1a\x7fCreates a bucket and optionally sets its policy to allow public read access while keeping uploads private (via presigned URLs).\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/mediabase/v1/upload/bucketB\xd8\x01\x92A\xc4\x01\x12q\n" +
 	"\rmediabase API\x12Xmediabase is a generic media storage service supporting presigned uploads and downloads.2\x06v1.0.0j\x1e\n" +
 	"\x04Ping\x12\x16Health check endpointsj/\n" +
 	"\x06Upload\x12%Media upload and management endpointsZ\x0e./mediabase_v1b\x06proto3"

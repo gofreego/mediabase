@@ -43,7 +43,7 @@ service MediabaseService {
     // PresignUpload generates a presigned URL for uploading a file
     rpc PresignUpload (PresignUploadRequest) returns (PresignUploadResponse) {
         option (google.api.http) = {
-            post: "/api/upload/presign/upload"
+            post: "/mediabase/v1/upload/presign/upload"
             body: "*"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -56,7 +56,7 @@ service MediabaseService {
     // PresignDownload generates a presigned URL for downloading a file
     rpc PresignDownload (PresignDownloadRequest) returns (PresignDownloadResponse) {
         option (google.api.http) = {
-            post: "/api/upload/presign/download"
+            post: "/mediabase/v1/upload/presign/download"
             body: "*"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -69,7 +69,7 @@ service MediabaseService {
     // DeleteObject deletes a file from storage
     rpc DeleteObject (DeleteObjectRequest) returns (DeleteObjectResponse) {
         option (google.api.http) = {
-            delete: "/api/upload/object/{object_key}"
+            delete: "/mediabase/v1/upload/object/{object_key}"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Upload"
@@ -81,7 +81,7 @@ service MediabaseService {
     // CreateBucket creates a bucket and optionally sets it to public read
     rpc CreateBucket (CreateBucketRequest) returns (CreateBucketResponse) {
         option (google.api.http) = {
-            post: "/api/upload/bucket"
+            post: "/mediabase/v1/upload/bucket"
             body: "*"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
