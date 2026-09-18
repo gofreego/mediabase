@@ -18,6 +18,8 @@ spec:
         - name: mediabase
           image: ghcr.io/gofreego/mediabase:pilot-1be27cd
           imagePullPolicy: Always
+          command:
+            - /app/application
           args:
             - -env=prod
             - -path=/etc/mediabase/config
