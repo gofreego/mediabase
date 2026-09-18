@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: mediabase
-          image: ghcr.io/gofreego/mediabase:pilot-b0dd734
+          image: ghcr.io/gofreego/mediabase:pilot-1be27cd
           imagePullPolicy: Always
           args:
             - -env=prod
