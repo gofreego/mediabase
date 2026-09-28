@@ -1,8 +1,13 @@
-# minio.zshala.com -> MinIO's web console (port 9001), for browsing buckets
-# etc. Distinct from media.zshala.com, which is MinIO's S3 API (port 9900)
-# used for presigned upload/download URLs — see minio-external.yaml.
+# minio.zshala.internal -> MinIO's web console (port 9001), for browsing
+# buckets etc. Distinct from media.zshala.com, which is MinIO's S3 API (port
+# 9900) used for presigned upload/download URLs — see minio-external.yaml.
 # Same pure-IP-routing approach: MinIO isn't in the cluster yet, so this
 # Service+Endpoints pair proxies to its existing LAN address.
+#
+# VPN/LAN-only, plain HTTP: minio.zshala.internal resolves only via the
+# cluster's CoreDNS (infra repo's coredns_internal_hosts), which is VPN
+# clients' DNS, and the Ingress allowlist (= infra's vpn_only_source_ranges,
+# keep in sync) stops it being reached by Host header via the public IP.
 apiVersion: v1
 kind: Service
 metadata:
@@ -32,15 +37,11 @@ kind: Ingress
 metadata:
   name: minio-console
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/whitelist-source-range: "172.18.0.0/16,192.168.1.0/24,10.244.0.0/16"
 spec:
   ingressClassName: nginx
-  tls:
-    - hosts:
-        - minio.zshala.com
-      secretName: minio-zshala-com-tls
   rules:
-    - host: minio.zshala.com
+    - host: minio.zshala.internal
       http:
         paths:
           - path: /
